@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore di Media Aritmetica</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .popup {
+            background: #ffffff;
+            color: #333;
+            border-radius: 10px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: popIn 0.4s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .popup h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .popup input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .popup button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .popup button:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            display: none;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .edit-section {
+            margin-top: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="startOverlay">
+        <div class="popup">
+            <h2>Quanti numeri vuoi inserire?</h2>
+            <input type="number" id="quantitaNumeri" placeholder="Inserisci un numero" required>
+            <button onclick="iniziaCalcolo()">Incomincia ad usare Media Aritmetica</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h1>Calcolatore di Media Aritmetica</h1>
+        <form id="mediaForm"></form>
+        <button onclick="calcolaMedia()">Calcola Media</button>
+        <div class="result" id="mediaRisultato"></div>
+        <div class="result" id="valutazione"></div>
+        <div class="edit-section">
+            <h2>Modifica Valutazione</h2>
+            <input type="number" id="modificaValutazione" placeholder="Modifica valore della media">
+            <button onclick="modificaMedia()">Applica Modifica</button>
+        </div>
+    </div>
+
+    <script>
+        function iniziaCalcolo() {
+            const quantita = parseInt(document.getElementById('quantitaNumeri').value);
+            if (isNaN(quantita) || quantita <= 0) {
+                alert('Inserisci un numero valido!');
+                return;
+            }
+
+            const mediaForm = document.getElementById('mediaForm');
+            mediaForm.innerHTML = '';
+
+            for (let i = 0; i < quantita; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.placeholder = `Numero ${i + 1}`;
+                input.required = true;
+                mediaForm.appendChild(input);
+            }
+
+            document.getElementById('startOverlay').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+        }
+
+        function calcolaMedia() {
+            const inputs = document.querySelectorAll('#mediaForm input[type="number"]');
+            let somma = 0;
+            let validInputs = 0;
+
+            inputs.forEach(input => {
+                const valore = parseFloat(input.value);
+                if (!isNaN(valore)) {
+                    somma += valore;
+                    validInputs++;
+                }
+            });
+
+            if (validInputs === 0) {
+                document.getElementById('mediaRisultato').textContent = 'Inserisci tutti i numeri correttamente!';
+                document.getElementById('valutazione').textContent = '';
+                return;
+            }
+
+            const media = somma / validInputs;
+            document.getElementById('mediaRisultato').textContent = `La media aritmetica è: ${media.toFixed(2)}`;
+
+            let valutazione;
+            if (media >= 9) {
+                valutazione = 'Avanzato';
+            } else if (media >= 7) {
+                valutazione = 'Intermedio';
+            } else if (media >= 5) {
+                valutazione = 'Base';
+            } else {
+                valutazione = 'Prima Acquisizione';
+            }
+
+            document.getElementById('valutazione').textContent = `Valutazione: ${valutazione}`;
+        }
+
+        function modificaMedia() {
+            const nuovoValore = parseFloat(document.getElementById('modificaValutazione').value);
+            if (isNaN(nuovoValore)) {
+                alert('Inserisci un valore valido per modificare la media!');
+                return;
+            }
+
+            document.getElementById('mediaRisultato').textContent = `La media modificata è: ${nuovoValore.toFixed(2)}`;
+
+            let valutazione;
+            if (nuovoValore >= 9) {
+                valutazione = 'Avanzato';
+            } else if (nuovoValore >= 7) {
+                valutazione = 'Intermedio';
+            } else if (nuovoValore >= 5) {
+                valutazione = 'Base';
+            } else {
+                valutazione = 'Prima Acquisizione';
+            }
+
+            document.getElementById('valutazione').textContent = `Valutazione: ${valutazione}`;
+        }
+    </script>
+</body>
+</html>
